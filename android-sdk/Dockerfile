@@ -95,15 +95,6 @@ RUN cd /usr/local/src && \
     ./configure --prefix=/usr && \
     make && \
     make install && \
-    RUN cd /usr/local/src && \
-    wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz && \
-    tar xvf protobuf-2.5.0.tar.gz && \
-    cd protobuf-2.5.0 && \
-    ls && \
-    ./autogen.sh && \
-    ./configure --prefix=/usr && \
-    make && \
-    make install && \
     ln -s /usr/bin/protoc /usr/local/bin/protoc-2.5.0
 
 ADD supervisord.conf /etc/supervisor/conf.d/
