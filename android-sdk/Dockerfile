@@ -58,12 +58,17 @@ RUN /opt/license_accepter.sh $ANDROID_HOME
 # setup adb server
 EXPOSE 5037
 
-# install and configure SSH server
+# install all dependenciees and configure SSH server
 EXPOSE 22
 ADD banner.net /etc/
 ADD authorized_keys /tmp/
 RUN apt-get update -y && \
     apt-get install -y openssh-server supervisor locales && \
+    apt-get install -y maven && \
+    apt-get install -y autoconf && \
+    apt-get install -y libtool && \
+    apt-get install -y g++ && \
+    apt-get install -y build-essential && \
     mkdir -p /var/run/sshd /var/log/supervisord && \
     locale-gen en en_US en_US.UTF-8 && \
     FILE_SSHD_CONFIG="/etc/ssh/sshd_config" && \
@@ -79,6 +84,19 @@ RUN apt-get update -y && \
     do if [ -f "$file" ]; then echo "\n" >> $FILE_AUTH_KEYS && cat $file >> $FILE_AUTH_KEYS && echo "\n" >> $FILE_AUTH_KEYS; fi; \
     done && \
     (rm /tmp/*.pub 2> /dev/null || true)
+
+# install protobuf250
+RUN cd /usr/local/src && \
+    wget https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.tar.gz && \
+    tar xvf protobuf-2.5.0.tar.gz && \
+    cd protobuf-2.5.0 && \
+    ls && \
+    ./autogen.sh && \
+    ./configure --prefix=/usr && \
+    make && \
+    make install && \
+    ln -s /usr/local/Cellar/protobuf@2.5/2.5.0/bin/protoc /usr/local/bin/protoc-2.5.0
+
 
 ADD supervisord.conf /etc/supervisor/conf.d/
 CMD ["/usr/bin/supervisord"]
